@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "缃戦〉鑷姩鍙戝竷锛圙itHub Pages + Cloudflare锛?,
-    "description": "璁?AI Agent 鍐欑殑缃戦〉鑷姩涓婁紶鍒?GitHub 骞堕厤缃?GitHub Pages锛涘～鍏?GitHub/Cloudflare API key 鍚庡彲缁戝畾鑷畾涔夊煙鍚?
+    "title": "网页自动发布（GitHub Pages + Cloudflare）",
+    "description": "让 AI Agent 写的网页自动上传到 GitHub 并配置 GitHub Pages；填入 GitHub/Cloudflare API key 后可绑定自定义域名"
   }
 }
