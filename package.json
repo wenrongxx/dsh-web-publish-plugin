@@ -2,7 +2,7 @@
   "name": "@local/web-publish-plugin",
   "version": "1.0.0",
   "private": true,
-  "description": "璁?AI Agent 鍐欑殑缃戦〉鑷姩涓婁紶鍒?GitHub 骞堕厤缃?GitHub Pages锛屾敮鎸?Cloudflare 鑷畾涔夊煙鍚?,
+  "description": "让 AI Agent 写的网页自动上传到 GitHub 并配置 GitHub Pages，支持 Cloudflare 自定义域名",
   "type": "module",
   "exports": {
     ".": "./src/dsh-plugin/index.js",
