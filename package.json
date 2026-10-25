@@ -1,0 +1,38 @@
+{
+  "name": "@local/web-publish-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "璁?AI Agent 鍐欑殑缃戦〉鑷姩涓婁紶鍒?GitHub 骞堕厤缃?GitHub Pages锛屾敮鎸?Cloudflare 鑷畾涔夊煙鍚?,
+  "type": "module",
+  "exports": {
+    ".": "./src/dsh-plugin/index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "files": [
+    "src/dsh-plugin/index.js",
+    "src/shared/**/*.ts",
+    "src/core/**/*.ts",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "mcp": "node dist/mcp-server/index.js",
+    "test": "node --test dist/"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}
