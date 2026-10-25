@@ -1,5 +1,5 @@
 {
-  "name": "@local/web-publish-plugin",
+  "name": "@wenrongxx/dsh-web-publish-plugin",
   "version": "1.0.0",
   "private": true,
   "description": "让 AI Agent 写的网页自动上传到 GitHub 并配置 GitHub Pages，支持 Cloudflare 自定义域名",
