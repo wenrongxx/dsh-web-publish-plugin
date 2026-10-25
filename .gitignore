@@ -1,0 +1,21 @@
+# 蹇界暐鏈哄瘑涓庢瀯寤轰骇鐗?node_modules/
+dist/
+*.log
+
+# 鏈湴娴嬭瘯閰嶇疆锛堝垏鍕挎彁浜?token锛?.env
+secrets.json
+*.key
+deploykey
+deploykey.pub
+
+# 涓存椂鎺㈡煡鑴氭湰涓庝骇鐗╋紙涓嶅澶栧彂甯冿級
+dsh-tools-index.js.txt
+test-plugin.mjs
+test-custom-domain.mjs
+probe.txt
+hello.txt
+_probe.bat
+inspect_asar.cjs
+asarextract.cjs
+asarextract_full.cjs
+check_sdk.js
