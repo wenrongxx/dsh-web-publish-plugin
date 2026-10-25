@@ -1,0 +1,10 @@
+{
+  "github": {
+    "owner": "浣犵殑GitHub鐢ㄦ埛鍚?,
+    "branch": "main"
+  },
+  "cloudflare": {
+    "zoneId": "浣犵殑Cloudflare Zone ID"
+  },
+  "repoVisibility": "public"
+}
