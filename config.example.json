@@ -1,10 +1,10 @@
 {
   "github": {
-    "owner": "浣犵殑GitHub鐢ㄦ埛鍚?,
+    "owner": "你的GitHub用户名",
     "branch": "main"
   },
   "cloudflare": {
-    "zoneId": "浣犵殑Cloudflare Zone ID"
+    "zoneId": "你的Cloudflare Zone ID"
   },
   "repoVisibility": "public"
 }
