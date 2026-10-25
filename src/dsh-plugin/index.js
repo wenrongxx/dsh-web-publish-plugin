@@ -1,9 +1,11 @@
 /**
- * DSH 缁勫悎鍖呮彃浠跺叆鍙ｏ紙Host 渚э級锛氭敞鍐?agent 宸ュ叿銆? *
- * DSH Loader 鐪熷疄鏈哄埗锛埪?锛夛細
- *  - export function apply(ctx) / export const inject锛屽鍑哄舰寮忎簩閫変竴涓嶆贩鐢? *  - 宸ュ叿鐢?ctx.tools.register(...) 娉ㄥ唽锛屽弬鏁颁负鎵佸钩瀵硅薄
+ * DSH 组合包插件入口（Host 侧）：注册 agent 工具。
+ *
+ * DSH Loader 真实机制（§2）：
+ *  - export function apply(ctx) / export const inject，导出形式二选一不混用
+ *  - 工具用 ctx.tools.register(...) 注册，参数为扁平对象
  *    { name, description, parameters: { key: { type, required, enum, description } }, execute }
- *  - 宸ュ叿杩斿洖 { content: [{ type: 'text', text }] }
+ *  - 工具返回 { content: [{ type: 'text', text }] }
  */
 import {
   CONFIG_FILE,
@@ -14,7 +16,7 @@ import {
   deploy,
 } from './deploy-core.js';
 
-// 缁熶竴鏂囨湰 output schema锛歟xecute 杩斿洖瀛楃涓诧紝render 杞?content block
+// 统一文本 output schema：execute 返回字符串，render 转 content block
 const TEXT_OUTPUT = {
   schema: { type: 'string' },
   render: (_args, value) => [{ type: 'text', text: value }],
@@ -27,50 +29,50 @@ export function apply(ctx) {
   ctx.tools.register({
     name: 'publish_website',
     description:
-      '鎶?AI Agent 鍐欏ソ鐨勭綉椤碉紙鏂囦欢璺緞 -> 鍐呭锛夎嚜鍔ㄤ笂浼犲埌 GitHub 浠撳簱锛屽紑鍚?GitHub Pages锛? +
-      '骞跺湪鏄庣‘鎸囧畾 customDomain 鏃剁粦瀹?Cloudflare 鑷畾涔夊煙鍚嶃€傞€傜敤浜庨儴缃查潤鎬侀〉闈€佸崟椤靛簲鐢ㄧ瓑銆?,
+      '把 AI Agent 写好的网页（文件路径 -> 内容）自动上传到 GitHub 仓库，开启 GitHub Pages，' +
+      '并在明确指定 customDomain 时绑定 Cloudflare 自定义域名。适用于部署静态页面、单页应用等。',
     output: TEXT_OUTPUT,
     parameters: {
       files: {
         type: 'object',
         required: true,
-        description: '鏂囦欢鏄犲皠锛氳矾寰?-> 鏂囨湰鍐呭锛岃嚦灏戝寘鍚?index.html',
+        description: '文件映射：路径 -> 文本内容，至少包含 index.html',
       },
       repo: {
         type: 'string',
         required: true,
-        description: '鏈」鐩殑浠撳簱鍚嶏紙蹇呭～锛屾瘡涓」鐩竴涓嫭绔嬩粨搴擄紱涓嶅瓨鍦ㄤ細鑷姩鍒涘缓锛?,
+        description: '本项目的仓库名（必填，每个项目一个独立仓库；不存在会自动创建）',
       },
-      branch: { type: 'string', required: false, description: '鍙戝竷鍒嗘敮锛岄粯璁?main' },
-      commitMessage: { type: 'string', required: false, description: '鎻愪氦淇℃伅' },
+      branch: { type: 'string', required: false, description: '发布分支，默认 main' },
+      commitMessage: { type: 'string', required: false, description: '提交信息' },
       enablePages: {
         type: 'boolean',
         required: false,
-        description: '鏄惁寮€鍚?GitHub Pages锛岄粯璁?true',
+        description: '是否开启 GitHub Pages，默认 true',
       },
       customDomain: {
         type: 'string',
         required: false,
         description:
-          '鏈」鐩缁戝畾鐨勮嚜瀹氫箟鍩熷悕锛堝彲閫夛紝渚嬪 www.example.com锛夛紱浠呭湪鏄庣‘鎸囧畾鏃舵墠缁戝畾锛屼笉鎸囧畾鍒欏彧鐢?*.github.io',
+          '本项目要绑定的自定义域名（可选，例如 www.example.com）；仅在明确指定时才绑定，不指定则只用 *.github.io',
       },
     },
     async execute(args) {
       try {
         const r = await deploy(args);
         return [
-          `鉁?閮ㄧ讲瀹屾垚锛?{r.repoFullName}`,
-          `浠撳簱锛?{r.repoUrl}`,
-          `Pages锛?{r.pagesUrl}${r.pagesEnabled ? '锛堝凡寮€鍚級' : '锛堟湭寮€鍚級'}`,
-          r.customDomainUrl ? `鑷畾涔夊煙鍚嶏細${r.customDomainUrl}` : '',
-          `鎻愪氦锛?{r.commitSha?.slice(0, 7)}锛屾枃浠讹細${r.pushedFiles.join('銆?)}`,
+          `✅ 部署完成：${r.repoFullName}`,
+          `仓库：${r.repoUrl}`,
+          `Pages：${r.pagesUrl}${r.pagesEnabled ? '（已开启）' : '（未开启）'}`,
+          r.customDomainUrl ? `自定义域名：${r.customDomainUrl}` : '',
+          `提交：${r.commitSha?.slice(0, 7)}，文件：${r.pushedFiles.join('、')}`,
           '',
           ...r.messages,
         ]
           .filter(Boolean)
           .join('\n');
       } catch (e) {
-        return `鉂?閮ㄧ讲澶辫触锛?{e.message}`;
+        return `❌ 部署失败：${e.message}`;
       }
     },
   });
@@ -78,46 +80,47 @@ export function apply(ctx) {
   /* ---------------------------- configure_plugin -------------------------- */
   ctx.tools.register({
     name: 'configure_plugin',
-    description: '鏌ョ湅鎴栨洿鏂?web-publish 鎻掍欢鐨勯厤缃紙GitHub/Cloudflare API key 绛夛級',
+    description: '查看或更新 web-publish 插件的配置（GitHub/Cloudflare API key 等）',
     output: TEXT_OUTPUT,
     parameters: {
       action: {
         type: 'string',
         required: true,
         enum: ['get', 'update'],
-        description: '鎿嶄綔绫诲瀷锛歡et=鏌ョ湅閰嶇疆锛寀pdate=鏇存柊閰嶇疆',
+        description: '操作类型：get=查看配置，update=更新配置',
       },
       githubToken: {
         type: 'string',
         required: false,
-        description: 'GitHub Personal Access Token锛坮epo + workflow 鏉冮檺锛?,
+        description: 'GitHub Personal Access Token（repo + workflow 权限）',
       },
-      githubOwner: { type: 'string', required: false, description: 'GitHub 鐢ㄦ埛鍚?缁勭粐鍚? },
-      githubBranch: { type: 'string', required: false, description: '榛樿鍒嗘敮锛堥粯璁?main锛? },
+      githubOwner: { type: 'string', required: false, description: 'GitHub 用户名/组织名' },
+      githubBranch: { type: 'string', required: false, description: '默认分支（默认 main）' },
       cloudflareApiToken: {
         type: 'string',
         required: false,
-        description: 'Cloudflare API Token锛圸one.DNS Edit 鏉冮檺锛?,
+        description: 'Cloudflare API Token（Zone.DNS Edit 权限）',
       },
       cloudflareZoneId: { type: 'string', required: false, description: 'Cloudflare Zone ID' },
       repoVisibility: {
         type: 'string',
         required: false,
         enum: ['public', 'private'],
-        description: '鑷姩鍒涘缓浠撳簱鐨勫彲瑙佹€э紙榛樿 public锛?,
+        description: '自动创建仓库的可见性（默认 public）',
       },
     },
     async execute(args) {
       if (args.action === 'get') {
         const cfg = loadConfig();
-        // 搂5锛歵oken/zoneId 涓嶅洖鏄句换浣曞瓧绗︼紝鍙姤锛堝凡璁剧疆锛?锛堟湭璁剧疆锛?        return [
-          '褰撳墠閰嶇疆锛?,
-          `GitHub Owner: ${cfg.github.owner ?? '锛堟湭璁剧疆锛?}`,
+        // §5：token/zoneId 不回显任何字符，只报（已设置）/（未设置）
+        return [
+          '当前配置：',
+          `GitHub Owner: ${cfg.github.owner ?? '（未设置）'}`,
           `GitHub Branch: ${cfg.github.branch ?? 'main'}`,
-          `GitHub Token: ${cfg.github.token ? '锛堝凡璁剧疆锛? : '锛堟湭璁剧疆锛?}`,
-          `Cloudflare Zone ID: ${cfg.cloudflare.zoneId ? '锛堝凡璁剧疆锛? : '锛堟湭璁剧疆锛?}`,
-          `Cloudflare API Token: ${cfg.cloudflare.apiToken ? '锛堝凡璁剧疆锛? : '锛堟湭璁剧疆锛?}`,
-          `浠撳簱鍙鎬? ${cfg.repoVisibility ?? 'public'}`,
+          `GitHub Token: ${cfg.github.token ? '（已设置）' : '（未设置）'}`,
+          `Cloudflare Zone ID: ${cfg.cloudflare.zoneId ? '（已设置）' : '（未设置）'}`,
+          `Cloudflare API Token: ${cfg.cloudflare.apiToken ? '（已设置）' : '（未设置）'}`,
+          `仓库可见性: ${cfg.repoVisibility ?? 'public'}`,
         ].join('\n');
       }
 
@@ -137,24 +140,24 @@ export function apply(ctx) {
           cloudflareApiToken: args.cloudflareApiToken || undefined,
         },
       });
-      return '鉁?閰嶇疆宸蹭繚瀛橈紙token 鍙繘 secrets.json锛屼笉鍐欏叆 config.json锛?;
+      return '✅ 配置已保存（token 只进 secrets.json，不写入 config.json）';
     },
   });
 
   /* ---------------------------- get_plugin_status ------------------------- */
   ctx.tools.register({
     name: 'get_plugin_status',
-    description: '鏌ヨ web-publish 鎻掍欢鐨勯厤缃畬鏁存€э紙涓嶅洖鏄句换浣曟満瀵嗭級',
+    description: '查询 web-publish 插件的配置完整性（不回显任何机密）',
     output: TEXT_OUTPUT,
     parameters: {},
     async execute() {
       const cfg = loadConfig();
       const missing = validateConfig(cfg);
       return [
-        '鎻掍欢鐘舵€侊細',
-        `閰嶇疆鏂囦欢: ${CONFIG_FILE}`,
-        `鏈哄瘑鏂囦欢: ${SECRETS_FILE}`,
-        `缂哄け閰嶇疆椤? ${missing.length > 0 ? missing.join('銆?) : '鏃狅紙閰嶇疆瀹屾暣锛?}`,
+        '插件状态：',
+        `配置文件: ${CONFIG_FILE}`,
+        `机密文件: ${SECRETS_FILE}`,
+        `缺失配置项: ${missing.length > 0 ? missing.join('、') : '无（配置完整）'}`,
       ].join('\n');
     },
   });
