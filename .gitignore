@@ -1,14 +1,16 @@
-# 蹇界暐鏈哄瘑涓庢瀯寤轰骇鐗?node_modules/
+# 忽略机密与构建产物
+node_modules/
 dist/
 *.log
 
-# 鏈湴娴嬭瘯閰嶇疆锛堝垏鍕挎彁浜?token锛?.env
+# 本地测试配置（切勿提交 token）
+.env
 secrets.json
 *.key
 deploykey
 deploykey.pub
 
-# 涓存椂鎺㈡煡鑴氭湰涓庝骇鐗╋紙涓嶅澶栧彂甯冿級
+# 临时探查脚本与产物（不对外发布）
 dsh-tools-index.js.txt
 test-plugin.mjs
 test-custom-domain.mjs
