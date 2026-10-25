@@ -1,4 +1,4 @@
 - insert:
     - id: web-publish-plugin
-      name: '@local/web-publish-plugin'
+      name: '@wenrongxx/dsh-web-publish-plugin'
       config: {}
